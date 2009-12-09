@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 
 from flatblocks.settings import CACHE_PREFIX
 
@@ -32,3 +33,11 @@ class FlatBlock(models.Model):
     class Meta:
         verbose_name = _('Flat block')
         verbose_name_plural = _('Flat blocks')
+        
+    def get_url(self):
+        if not hasattr(self, '_url'):
+            if self.named_url:
+                self._url = reverse(self.named_url)
+            else:
+                self._url = self.url
+        return self._url
