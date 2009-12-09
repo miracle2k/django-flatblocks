@@ -18,6 +18,8 @@ class FlatBlock(models.Model):
                 verbose_name=_('Header'),
                 help_text=_("An optional header for this content"))
     content = models.TextField(verbose_name=_('Content'), blank=True, null=True)
+    url = models.CharField(_('URL'), max_length=200, blank=True)
+    named_url = models.CharField(_('Named URL'), max_length=200, blank=True)
 
     def __unicode__(self):
         return u"%s" % (self.slug,)
