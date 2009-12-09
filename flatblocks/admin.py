@@ -12,14 +12,14 @@ class FlatBlockAdmin(admin.ModelAdmin):
         Form = super(FlatBlockAdmin, self).get_form(request, obj, **kwargs)
         class MyFlatBlockForm(Form):
             def clean_named_url(self):
-                if 'named_url' in self.cleaned_data:
-                    data = self.cleaned_data['named_url']
-                    try:
+                data = self.cleaned_data.get('named_url')
+                try:
+                    if data:
                         urlresolvers.reverse(data)
-                    except urlresolvers.NoReverseMatch:
-                        raise forms.ValidationError(u'This is not a valid URL.')
-                    else:
-                        return data
+                except urlresolvers.NoReverseMatch:
+                    raise forms.ValidationError(u'This is not a valid URL.')
+                else:
+                    return data
         return MyFlatBlockForm
 
 admin.site.register(FlatBlock, FlatBlockAdmin)
