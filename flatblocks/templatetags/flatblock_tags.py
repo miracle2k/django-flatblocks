@@ -126,7 +126,12 @@ class FlatBlockNode(template.Node):
         self.is_variable = is_variable
         self.cache_time = cache_time
         self.with_template = with_template
-    
+
+    def get_flatblock(self, context, slug):
+        """Should return a FlatBlock instance, or raise FlatBlock.DoesNotExist.
+        """
+        return FlatBlock.objects.get(slug=slug)
+
     def render(self, context):
         if self.is_variable:
             real_slug = template.Variable(self.slug).resolve(context)
@@ -145,7 +150,7 @@ class FlatBlockNode(template.Node):
             cache_key = CACHE_PREFIX + real_slug
             c = cache.get(cache_key)
             if c is None:
-                c = FlatBlock.objects.get(slug=real_slug)
+                c = self.get_flatblock(context, real_slug)
                 cache.set(cache_key, c, int(self.cache_time))
             if self.with_template:
                 tmpl = loader.get_template(real_template)
