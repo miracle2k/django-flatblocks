@@ -128,9 +128,10 @@ class FlatBlockNode(template.Node):
         self.with_template = with_template
 
     def get_flatblock(self, context, slug):
-        """Should return a FlatBlock instance, or raise FlatBlock.DoesNotExist.
+        """Should return a 2-tuple of FlatBlock instance and additional 
+        cache key suffix, or raise FlatBlock.DoesNotExist.
         """
-        return FlatBlock.objects.get(slug=slug)
+        return FlatBlock.objects.get(slug=slug), False
 
     def render(self, context):
         if self.is_variable:
@@ -150,8 +151,8 @@ class FlatBlockNode(template.Node):
             cache_key = CACHE_PREFIX + real_slug
             c = cache.get(cache_key)
             if c is None:
-                c = self.get_flatblock(context, real_slug)
-                cache.set(cache_key, c, int(self.cache_time))
+                c, key_suffix = self.get_flatblock(context, real_slug)
+                cache.set("%s%s" % (cache_key, key_suffix or ""), c, int(self.cache_time))
             if self.with_template:
                 tmpl = loader.get_template(real_template)
                 new_ctx.update({'flatblock':c})
